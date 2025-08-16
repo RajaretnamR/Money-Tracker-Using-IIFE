@@ -5,9 +5,9 @@
 const itemCtrl = (function(){
 
     //Item constructor :
-    const Item = function(name , id , money){
-        this.name = name;
+    const Item = function(id, name , money){
         this.id = id;
+        this.name = name;
         this.money = money;
 
     }
@@ -45,10 +45,10 @@ const itemCtrl = (function(){
                 ID=0;
             }
 
-            money = Number(money);
+            money = Number(money); // Idhu vandhu money la namma type panuradhu number nu adhoa typeos show panuradhukaga :
 
             //Create a New Item :
-            newItem = new Item(name, ID, money)
+            newItem = new Item(ID, name, money) // Enoda constructor function ah call panure ;
 
             
             //Add to item to array :
@@ -58,7 +58,27 @@ const itemCtrl = (function(){
             return newItem;
             
              
+        },
+        // Item Controller return section la add pannu
+        getTotalMoney: function() {
+
+            let total = 0;
+
+            if(data.items.length > 0){
+                data.items.forEach(function(item){
+                    total += item.money;
+
+                    data.totalMoney = total;
+                })
+            }else{
+                data.totalMoney = 0;
+
+            }
+
+            return total;
+
         }
+
 
 
     }
@@ -69,12 +89,12 @@ const itemCtrl = (function(){
 
 
 //UI Controller => UI la eppadi show panna
-
      const UICntrl = (function(){
         return{
             populateItemList:function(items){
                 // console.log(items);
-                let html ="";
+
+                let html =""; 
                 items.forEach(function(item){
                     // console.log(item)
 
@@ -90,6 +110,13 @@ const itemCtrl = (function(){
                 });
 
                 document.querySelector("#item-list").innerHTML = html;
+            },
+
+            showEditState:function(){
+                 document.querySelector(".add-btn").style.display ="none";
+                document.querySelector(".update-btn").style.display ="inline";
+                document.querySelector(".delete-btn").style.display ="inline";
+                document.querySelector(".back-btn").style.display ="inline";
             },
             
 
@@ -109,28 +136,42 @@ const itemCtrl = (function(){
                 }
             },
 
+            clearInputState:function(newItem){
+                name:document.querySelector("#item-name").value = "" ;
+                money:document.querySelector("#item-money").value = ""
+            },
+            
+
             addListItem:function(newItem){
                 // console.log(newItem)
 
+                //Create a LI element :
                 const li =document.createElement("li");
 
+                //Create a className to Li :
                 li.className = "collection-item";
 
-                li.id = ` item-${newItem.id}`;
+                //Add ID To li
+                li.id = `item-${newItem.id}`;
 
+                //Insert an HTML :
                 li.innerHTML = `
-                 <strong>${newItem.name}</strong> :
+                               <strong>${newItem.name}</strong> :
                                 <em>${newItem.money} RS</em>
                                 <a href="#!" class="secondary-content">
                                    <i class="fa-solid fa-pencil edit-item"></i>
                                 </a>
-                
-                
                 `;
 
-                //insert into the UL :
+                //insert into the UL : 
                 document.querySelector("#item-list").appendChild(li);
+            },
+
+          // UI Controller la add this function
+                showTotalMoney: function(totalMoney) {
+                    document.querySelector('.total-money').innerText = totalMoney ;
             }
+
         }
      })();
 
@@ -143,6 +184,10 @@ const itemCtrl = (function(){
 
         //Add item panuradhuuku create panura function :
         document.querySelector(".add-btn").addEventListener("click" , itemAddSubmit);
+
+        // Edit item Click 
+        document.querySelector("#item-list").addEventListener("click" , itemEditClick);
+
      }
 
      const itemAddSubmit = function(e){
@@ -157,7 +202,7 @@ const itemCtrl = (function(){
         if(input.name==="" || input.money===""){
             alert("Dei! Edhachu Ni value kudukanum da ??!!")
         }else{
-            console.log(input);
+            // console.log(input);
 
             //Add btn Click panna Items kulla na kudukura new Item add aaganum UI la :
             const newItem = itemCtrl.addItem(input.name , input.money);
@@ -165,26 +210,39 @@ const itemCtrl = (function(){
             // Add item TO UI :
             UICntrl.addListItem(newItem);
 
-            
+            //  Step 3 - total calculate + show
+            const totalMoney = itemCtrl.getTotalMoney();
+            UICntrl.showTotalMoney(totalMoney);
+
+            //Once ellamet UI la vandhona INput Fields la clear aaaganum :
+            UICntrl.clearInputState();
+ 
         }
-
-
-
      }
 
+     const itemEditClick = function(e){
+        if(e.target.classList.contains("edit-item")){
+            UICntrl.showEditState();
+        }
+     }
 
+     
+     return{
+         start:function(){
 
+            //Clear the Button :
+             UICntrl.clearEditState();
 
-    //Clear the Button :
-     UICntrl.clearEditState();
-
-    return{
-        start:function(){
             const items =  itemCtrl.getItem()
 
             // console.log(items)
             if(items.length > 0){
-                UICntrl.populateItemList(items)
+                UICntrl.populateItemList(items);
+
+                   //  Step 3 - total calculate + show
+            const totalMoney = itemCtrl.getTotalMoney();
+            UICntrl.showTotalMoney(totalMoney);
+            // console.log(totalMoney)
             }
             loadEventListerners();
         }
