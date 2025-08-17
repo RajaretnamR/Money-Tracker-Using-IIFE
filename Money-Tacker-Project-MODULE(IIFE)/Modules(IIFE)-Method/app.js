@@ -61,8 +61,7 @@ const itemCtrl = (function(){
         },
         // Item Controller return section la add pannu
         getTotalMoney: function() {
-
-            let total = 0;
+            let total = 0; // Intial ah 0
 
             if(data.items.length > 0){
                 data.items.forEach(function(item){
@@ -72,17 +71,14 @@ const itemCtrl = (function(){
                 })
             }else{
                 data.totalMoney = 0;
-
             }
-
             return total;
+        },
 
-        }
-
+        
 
 
     }
-    
     
 })()
 // console.log(itemCtrl.getItem())
@@ -112,8 +108,10 @@ const itemCtrl = (function(){
                 document.querySelector("#item-list").innerHTML = html;
             },
 
+
+            //Edit icon ah click panna Add btn hide aagum balance thre btns show aagum :
             showEditState:function(){
-                 document.querySelector(".add-btn").style.display ="none";
+                document.querySelector(".add-btn").style.display ="none";
                 document.querySelector(".update-btn").style.display ="inline";
                 document.querySelector(".delete-btn").style.display ="inline";
                 document.querySelector(".back-btn").style.display ="inline";
@@ -128,6 +126,7 @@ const itemCtrl = (function(){
                 document.querySelector(".back-btn").style.display ="none";
             },
 
+            //Item name & money enter pannona UI la show aaguraduku :
             getInputItem:function(){
                 return{
                     name:document.querySelector("#item-name").value.trim(),
@@ -136,12 +135,15 @@ const itemCtrl = (function(){
                 }
             },
 
+
+            // Once items ellamey enter aanona input fields clear aagirum adhukaga :
             clearInputState:function(newItem){
                 name:document.querySelector("#item-name").value = "" ;
                 money:document.querySelector("#item-money").value = ""
             },
             
 
+            // Default ah iruka 3items ah thaadi nama new items add panna adhu show aaguradhkaaga :
             addListItem:function(newItem){
                 // console.log(newItem)
 
@@ -181,7 +183,6 @@ const itemCtrl = (function(){
   const app = (function(){
 
      const loadEventListerners = function(){
-
         //Add item panuradhuuku create panura function :
         document.querySelector(".add-btn").addEventListener("click" , itemAddSubmit);
 
@@ -191,7 +192,7 @@ const itemCtrl = (function(){
      }
 
      const itemAddSubmit = function(e){
-         e.preventDefault();
+         e.preventDefault(); // epala Item ah add panureno apala page  refresh behaviour stop panuradhuku idu 
         //  console.log("hello macha Iam clicked ")
 
         // item & money enter panna item UI la add aaganum adhukaga :
@@ -219,34 +220,33 @@ const itemCtrl = (function(){
  
         }
      }
-
+    
+     // Specific edit icon ah click panna nadkura function :
      const itemEditClick = function(e){
         if(e.target.classList.contains("edit-item")){
             UICntrl.showEditState();
         }
-     }
+     }   
+        return{
+            start:function(){
 
-     
-     return{
-         start:function(){
+                //Clear the Button :
+                UICntrl.clearEditState();
 
-            //Clear the Button :
-             UICntrl.clearEditState();
+                const items =  itemCtrl.getItem()
 
-            const items =  itemCtrl.getItem()
+                // console.log(items)
+                if(items.length > 0){
+                    UICntrl.populateItemList(items);
 
-            // console.log(items)
-            if(items.length > 0){
-                UICntrl.populateItemList(items);
-
-                   //  Step 3 - total calculate + show
-            const totalMoney = itemCtrl.getTotalMoney();
-            UICntrl.showTotalMoney(totalMoney);
-            // console.log(totalMoney)
+                //  Step 3 - total calculate + show
+                const totalMoney = itemCtrl.getTotalMoney();
+                UICntrl.showTotalMoney(totalMoney);
+                // console.log(totalMoney)
+                }
+                loadEventListerners();
             }
-            loadEventListerners();
         }
-    }
   })()
 app.start()
 
