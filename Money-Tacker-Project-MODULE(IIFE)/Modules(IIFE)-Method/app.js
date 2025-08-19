@@ -1,7 +1,6 @@
 
 
 //Item Controller => items data handle (add/update/delete/total)
-
 const itemCtrl = (function(){
 
     //Item constructor :
@@ -25,7 +24,7 @@ const itemCtrl = (function(){
         currentItem:null
      };
 
-     return { // Module pattern la return panuradhu ellamey Method ah dha irukanum :
+     return { // Module   pattern la return panuradhu ellamey Method ah dha irukanum :
         getItem:function(){
             return data.items; 
 
@@ -75,6 +74,47 @@ const itemCtrl = (function(){
             return total;
         },
 
+        getItemByID:function(id){
+
+            let found = null;
+
+            data.items.forEach(function(item){
+                if(item.id===id){
+                    found=item
+                }
+            })
+
+            return found
+        },
+
+        //Found aana item ah idhula set panite :
+        setCurrentItem:function(item){
+            data.currentItem = item;
+        },
+
+        getCurrentItem:function(){
+            return data.currentItem;
+        },
+
+        deleteItem:function(id){
+
+        // get ID's :
+        const ids = data.items.map(function(item){
+            return item.id;
+        });
+
+        //get index :
+        const index =ids.indexOf(id);
+
+        //Doing a splice Method :
+        data.items.splice(index , 1);
+    },
+
+
+    clearAllItems:function(){
+        data.items =[];
+    }
+
         
 
 
@@ -95,7 +135,7 @@ const itemCtrl = (function(){
                     // console.log(item)
 
                     html += `
-                            <li class="collection-item" data-id="${item.id}">
+                            <li class="collection-item" id="item-${item.id}">
                                 <strong>${item.name}</strong> :
                                 <em>${item.money} RS</em>
                                 <a href="#!" class="secondary-content">
@@ -172,6 +212,27 @@ const itemCtrl = (function(){
           // UI Controller la add this function
                 showTotalMoney: function(totalMoney) {
                     document.querySelector('.total-money').innerText = totalMoney ;
+            },
+            addItemToForm:function(){
+                document.querySelector("#item-name").value = itemCtrl.getCurrentItem().name;
+                document.querySelector("#item-money").value = itemCtrl.getCurrentItem().money;
+              },
+
+            deletelistItem:function(id){
+                // console.log(id);
+
+                const itemID = `#item-${id}`;
+
+                const item = document.querySelector(itemID);
+
+                item.remove();
+                 
+            },
+
+            clearItems:function(){
+                const collection = document.querySelector("#item-list");
+
+                collection.innerHTML = ""; 
             }
 
         }
@@ -188,6 +249,15 @@ const itemCtrl = (function(){
 
         // Edit item Click 
         document.querySelector("#item-list").addEventListener("click" , itemEditClick);
+
+        //back btn click panna back ponum :
+        document.querySelector(".back-btn").addEventListener("click" , backClick);
+        
+        //Clear btn click panna Items clr aaganum :
+        document.querySelector(".clear-btn").addEventListener("click" , itemClearSubmit);
+        
+        //Delete btn click panna dlt aaganum :
+        document.querySelector(".delete-btn").addEventListener("click" , itemDeleteSubmit);
 
      }
 
@@ -224,9 +294,92 @@ const itemCtrl = (function(){
      // Specific edit icon ah click panna nadkura function :
      const itemEditClick = function(e){
         if(e.target.classList.contains("edit-item")){
+       
+            const listID = e.target.parentElement.parentElement.id;
+            // console.log(listID)
+
+            //String ah array ah change panure :
+            const listArr = listID.split("-");
+            // console.log(listArr);
+
+            // Get the actual ID:
+            const id =parseInt(listArr[1]);
+            // console.log(id);
+
+            //get item :
+            const itemToEdit = itemCtrl.getItemByID(id);
+
+            itemCtrl.setCurrentItem(itemToEdit);
+
+            UICntrl.addItemToForm();
+             
             UICntrl.showEditState();
+
         }
+
+        
      }   
+
+     //back btn ha click panna nadakura function :
+     const backClick = function(e){
+        UICntrl.clearEditState();
+        UICntrl.clearInputState();
+     }
+
+     //Dlt click panna nadakura event :
+     const itemDeleteSubmit = function(){
+
+        //get the current item :
+        const currentItem = itemCtrl.getCurrentItem();
+
+        //Delete the current item:
+        itemCtrl.deleteItem(currentItem.id);
+ 
+        // console.log(currentItem)
+
+        //Delete from the UI :
+        UICntrl.deletelistItem(currentItem.id);
+
+
+        //Get the total money : 
+        const totalMoney = itemCtrl.getTotalMoney();
+
+        //Update the total money into UI :
+        UICntrl.showTotalMoney(totalMoney);
+
+        //Clear a UI input :
+        UICntrl.clearInputState();
+
+        //clear the btn state :
+        UICntrl.clearEditState();
+
+     }
+
+    //clear btn ah click panna nadakur function : 
+    const itemClearSubmit = function(e){
+        itemCtrl.clearAllItems();
+
+        //Clear all from UI :
+        UICntrl.clearItems();
+
+        //Get the total money : 
+        const totalMoney = itemCtrl.getTotalMoney();
+
+        //Update the total money into UI :
+        UICntrl.showTotalMoney(totalMoney);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
         return{
             start:function(){
 
